@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Download Resources - SafeSpace</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="/static/styles.css" />
+    </head>
+    <body>
+        <!-- Header / Navigation -->
+        <header id="header">
+            <div class="container nav-container">
+                <a href="index.html" class="logo">
+                    <img
+                        src="/static/images/safe.png"
+                        alt="SafeSpace Logo"
+                        class="safe-logo"
+                    />
+                </a>
+
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/report" class="nav-link">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safetydirectory" class="nav-link"
+                            >Safety Directory</a
+                        >
+                    </li>
+                    <li class="nav-item">
+                        <a href="/downloads" class="nav-link">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/support" class="nav-link">Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safety" class="nav-link">Safety</a>
+                    </li>
+                    <li class="nav-item nav-cta">
+                        <button
+                            class="btn btn-emergency"
+                            onclick="triggerEmergency()"
+                        >
+                            Emergency Help
+                        </button>
+                    </li>
+
+                    <script>
+                        async function triggerEmergency() {
+                            if (!navigator.geolocation) {
+                                alert(
+                                    "Geolocation is not supported by your browser."
+                                );
+                                return;
+                            }
+
+                            navigator.geolocation.getCurrentPosition(
+                                async (position) => {
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+
+                                    // Reverse geocode: get human-readable address from coordinates
+                                    let address = `Lat: ${lat}, Lon: ${lon}`;
+                                    try {
+                                        const geoRes = await fetch(
+                                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+                                        );
+                                        const geoData = await geoRes.json();
+                                        if (geoData.display_name) {
+                                            address = geoData.display_name;
+                                        }
+                                    } catch (err) {
+                                        console.error(
+                                            "Reverse geocoding failed:",
+                                            err
+                                        );
+                                    }
+
+                                    // Emergency message with location
+                                    const emergencyNumber = "+27612028093";
+                                    const emergencyMessage = `🚨 EMERGENCY ALERT: A user needs immediate help!\n📍 Location: ${address}\n🔗 Maps: https://www.google.com/maps?q=${lat},${lon}`;
+
+                                    // Send to Flask backend -> Africa's Talking
+                                    fetch("/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type":
+                                                "application/x-www-form-urlencoded",
+                                        },
+                                        body: `number=${encodeURIComponent(
+                                            emergencyNumber
+                                        )}&message=${encodeURIComponent(
+                                            emergencyMessage
+                                        )}`,
+                                    })
+                                        .then((response) => response.text())
+                                        .then((data) => {
+                                            alert(
+                                                "✅ Emergency alert with live location sent!"
+                                            );
+                                            console.log(
+                                                "Server response:",
+                                                data
+                                            );
+                                        })
+                                        .catch((error) => {
+                                            alert(
+                                                "❌ Failed to send emergency alert."
+                                            );
+                                            console.error("Error:", error);
+                                        });
+                                },
+                                () => {
+                                    alert("⚠️ Unable to retrieve location.");
+                                }
+                            );
+                        }
+                    </script>
+
+                    <li class="nav-item quick-exit">
+                        <a
+                            href="https://www.google.com/search?client=firefox-b-d&q=famous+tik+tok+dances+2025"
+                            class="btn btn-emergency"
+                            >Quick Exit</a
+                        >
+                    </li>
+                </ul>
+
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-heading">Downloadable Resources</h1>
+                    <p class="hero-subheading">
+                        Access and download helpful guides, information, and
+                        contact lists for offline use. All resources are
+                        available in multiple languages.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#safety-guides" class="btn btn-primary"
+                            >Safety Guides</a
+                        >
+                        <a href="#legal-resources" class="btn btn-secondary"
+                            >Legal Resources</a
+                        >
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <i href="/safe.png" class="fas fa-download"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Guides Section -->
+        <section class="about" id="safety-guides">
+            <div class="container">
+                <h2 class="section-title">Safety Planning Guides</h2>
+                <p class="text-center">
+                    Download these guides to help create a safety plan for
+                    yourself or someone you know.
+                </p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3 class="feature-title">Personal Safety Plan</h3>
+                        <p>
+                            Step-by-step guide to creating a personalized safety
+                            plan for various situations.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 1.2MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">isiZulu</span>
+                                <span class="language-tag">Afrikaans</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary" download
+                            ><i class="fas fa-download"></i> Download</a
+                        >
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-house-user"></i>
+                        </div>
+                        <h3 class="feature-title">Home Safety Checklist</h3>
+                        <p>
+                            Important safety measures to implement at home for
+                            increased protection.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 0.8MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">isiXhosa</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary" download
+                            ><i class="fas fa-download"></i> Download</a
+                        >
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Digital Safety Guide</h3>
+                        <p>
+                            How to maintain privacy and security on your devices
+                            and online accounts.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 1.5MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary" download
+                            ><i class="fas fa-download"></i> Download</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legal Resources Section -->
+        <section class="features" id="legal-resources">
+            <div class="container">
+                <h2 class="section-title">Legal Resources & Rights</h2>
+
+                <div class="features-container">
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        <h3>Know Your Rights</h3>
+                        <p>
+                            Comprehensive guide to your legal rights as a GBV
+                            survivor in South Africa.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 2.1MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">isiZulu</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-outline" download
+                            ><i class="fas fa-download"></i> Download Guide</a
+                        >
+                    </div>
+
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <h3>Protection Order Information</h3>
+                        <p>
+                            Step-by-step explanation of how to apply for a
+                            protection order.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 1.7MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">Afrikaans</span>
+                                <span class="language-tag">Sesotho</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-outline" download
+                            ><i class="fas fa-download"></i> Download Info</a
+                        >
+                    </div>
+
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3>Court Process Guide</h3>
+                        <p>
+                            What to expect if your case goes to court and how to
+                            prepare.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 2.3MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-outline" download
+                            ><i class="fas fa-download"></i> Download Guide</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency Contacts Section -->
+        <section class="about" id="emergency-contacts">
+            <div class="container">
+                <h2 class="section-title">Emergency Contact Lists</h2>
+                <p class="text-center">
+                    Download and print these contact lists to keep important
+                    numbers accessible.
+                </p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h3 class="feature-title">National Hotlines</h3>
+                        <p>
+                            Comprehensive list of national emergency numbers and
+                            support services.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 0.5MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">All Languages</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary" download
+                            ><i class="fas fa-download"></i> Download</a
+                        >
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Provincial Resources</h3>
+                        <p>
+                            Province-specific contacts for shelters, police
+                            stations, and support services.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 1.8MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary" download
+                            ><i class="fas fa-download"></i> Download</a
+                        >
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 class="feature-title">Support Organizations</h3>
+                        <p>
+                            Directory of NGOs and community organizations
+                            offering GBV support.
+                        </p>
+                        <div class="download-info">
+                            <span class="file-size">PDF - 1.2MB</span>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary" download
+                            ><i class="fas fa-download"></i> Download</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency CTA Banner -->
+        <section class="cta-banner">
+            <div class="container">
+                <h2 class="cta-heading">Need Immediate Help?</h2>
+                <p class="cta-text">
+                    Contact the GBV Emergency Hotline: 0800 428 428
+                </p>
+                <a href="tel:0800428428" class="btn btn-light">Call Now</a>
+                <a href="sms:34343" class="btn btn-light">SMS HELP</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <a href="index.html" class="footer-logo">SafeSpace</a>
+                        <p class="footer-about">
+                            Providing support, resources, and safe reporting
+                            options for GBV survivors across South Africa.
+                        </p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-links">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li>
+                                <a href="/report">Report Incident</a>
+                            </li>
+                            <li><a href="/downloads">Resources</a></li>
+                            <li><a href="/support">Support</a></li>
+                            <li>
+                                <a href="/safety">Safety Features</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-contact">
+                        <h3 class="footer-heading">Emergency Contacts</h3>
+                        <p>GBV Emergency Hotline: 0800 428 428</p>
+                        <p>Police Emergency: 10111</p>
+                        <p>SMS Line: 34343</p>
+                        <p>USSD: *134*123#</p>
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>
+                        © 2025 SafeSpace. All rights reserved. |
+                        <a href="#">Privacy Policy</a> |
+                        <a href="#">Terms of Use</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- AI chat (fixed at bottom) -->
+        <div class="chat-container">
+            <div class="chat-button" id="chatToggle">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-window" id="chatWindow">
+                <div class="chat-header">
+                    <h3>SafeSpace Assistant</h3>
+                    <button class="close-chat" id="closeChat">&times;</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        Hi, I'm here to help. How can I assist you today?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Type your question here..."
+                    />
+                    <button id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/script.js"></script>
+    </body>
+</html>

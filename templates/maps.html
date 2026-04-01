@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Safety Map - SafeSpace</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        />
+        <link rel="stylesheet" href="/static/styles.css" />
+        <style>
+            /* Additional styles specific to the map page */
+            .map-hero {
+                background: linear-gradient(
+                    135deg,
+                    var(--primary-color) 0%,
+                    #6c3483 100%
+                );
+                color: var(--white);
+                padding: 140px 0 80px;
+                text-align: center;
+                margin-top: 80px;
+            }
+
+            .map-container {
+                position: relative;
+                height: 70vh;
+                width: 100%;
+                z-index: 1;
+            }
+
+            #map {
+                height: 100%;
+                width: 100%;
+                z-index: 1;
+            }
+
+            .map-overlay {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 10px;
+                padding: 15px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                width: 300px;
+                max-width: 90%;
+            }
+
+            .map-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .map-action-btn {
+                display: flex;
+                align-items: center;
+                padding: 12px 15px;
+                background: var(--white);
+                border: 1px solid #eee;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: var(--transition);
+                text-align: left;
+            }
+
+            .map-action-btn:hover {
+                background: var(--light-gray);
+                transform: translateY(-2px);
+            }
+
+            .map-action-icon {
+                margin-right: 10px;
+                width: 24px;
+                color: var(--primary-color);
+            }
+
+            .safety-alerts {
+                background: #fff4f4;
+                border-left: 4px solid var(--emergency-color);
+                padding: 15px 20px;
+                margin: 20px 0;
+                border-radius: 5px;
+            }
+
+            .alert-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .alert-icon {
+                color: var(--emergency-color);
+                margin-right: 10px;
+                font-size: 1.2rem;
+            }
+
+            .alert-title {
+                font-weight: 700;
+                margin: 0;
+            }
+
+            .alert-content {
+                margin: 0;
+                font-size: 0.95rem;
+            }
+
+            .map-controls {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin: 20px 0;
+            }
+
+            .map-control-btn {
+                padding: 10px 20px;
+                background: var(--primary-color);
+                color: var(--white);
+                border: none;
+                border-radius: 30px;
+                cursor: pointer;
+                transition: var(--transition);
+                display: flex;
+                align-items: center;
+            }
+
+            .map-control-btn:hover {
+                background: #7d3fa3;
+                transform: translateY(-2px);
+            }
+
+            .map-control-icon {
+                margin-right: 8px;
+            }
+
+            .legend {
+                background: rgba(255, 255, 255, 0.9);
+                padding: 15px;
+                border-radius: 8px;
+                position: absolute;
+                bottom: 20px;
+                left: 20px;
+                z-index: 1000;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .legend-title {
+                margin: 0 0 10px 0;
+                font-size: 1rem;
+                font-weight: 600;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+            }
+
+            .legend-color {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                margin-right: 8px;
+            }
+
+            .legend-label {
+                font-size: 0.9rem;
+            }
+
+            .location-info {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.9);
+                padding: 10px 15px;
+                border-radius: 8px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+                max-width: 250px;
+            }
+
+            @media (max-width: 768px) {
+                .map-hero {
+                    padding: 120px 0 60px;
+                    margin-top: 70px;
+                }
+
+                .map-overlay {
+                    top: 10px;
+                    right: 10px;
+                    width: 250px;
+                }
+
+                .location-info {
+                    top: 10px;
+                    left: 10px;
+                    max-width: 200px;
+                }
+
+                .legend {
+                    bottom: 10px;
+                    left: 10px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Header / Navigation -->
+        <header id="header">
+            <div class="container nav-container">
+                <a href="index.html" class="logo">
+                    <img
+                        src="/static/images/safe.png"
+                        alt="SafeSpace Logo"
+                        class="safe-logo"
+                    />
+                </a>
+
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/report" class="nav-link">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safetydirectory" class="nav-link"
+                            >Safety Directory</a
+                        >
+                    </li>
+                    <li class="nav-item">
+                        <a href="/downloads" class="nav-link">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/support" class="nav-link">Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safety" class="nav-link">Safety</a>
+                    </li>
+                    <li class="nav-item nav-cta">
+                        <button
+                            class="btn btn-emergency"
+                            onclick="triggerEmergency()"
+                        >
+                            Emergency Help
+                        </button>
+                    </li>
+
+                    <script>
+                        async function triggerEmergency() {
+                            if (!navigator.geolocation) {
+                                alert(
+                                    "Geolocation is not supported by your browser."
+                                );
+                                return;
+                            }
+
+                            navigator.geolocation.getCurrentPosition(
+                                async (position) => {
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+
+                                    // Reverse geocode: get human-readable address from coordinates
+                                    let address = `Lat: ${lat}, Lon: ${lon}`;
+                                    try {
+                                        const geoRes = await fetch(
+                                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+                                        );
+                                        const geoData = await geoRes.json();
+                                        if (geoData.display_name) {
+                                            address = geoData.display_name;
+                                        }
+                                    } catch (err) {
+                                        console.error(
+                                            "Reverse geocoding failed:",
+                                            err
+                                        );
+                                    }
+
+                                    // Emergency message with location
+                                    const emergencyNumber = "+27612028093";
+                                    const emergencyMessage = `🚨 EMERGENCY ALERT: A user needs immediate help!\n📍 Location: ${address}\n🔗 Maps: https://www.google.com/maps?q=${lat},${lon}`;
+
+                                    // Send to Flask backend -> Africa's Talking
+                                    fetch("/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type":
+                                                "application/x-www-form-urlencoded",
+                                        },
+                                        body: `number=${encodeURIComponent(
+                                            emergencyNumber
+                                        )}&message=${encodeURIComponent(
+                                            emergencyMessage
+                                        )}`,
+                                    })
+                                        .then((response) => response.text())
+                                        .then((data) => {
+                                            alert(
+                                                "✅ Emergency alert with live location sent!"
+                                            );
+                                            console.log(
+                                                "Server response:",
+                                                data
+                                            );
+                                        })
+                                        .catch((error) => {
+                                            alert(
+                                                "❌ Failed to send emergency alert."
+                                            );
+                                            console.error("Error:", error);
+                                        });
+                                },
+                                () => {
+                                    alert("⚠️ Unable to retrieve location.");
+                                }
+                            );
+                        }
+                    </script>
+
+                    <li class="nav-item quick-exit">
+                        <a
+                            href="https://www.google.com/search?client=firefox-b-d&q=famous+tik+tok+dances+2025"
+                            class="btn btn-emergency"
+                            >Quick Exit</a
+                        >
+                    </li>
+                </ul>
+
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-heading">Safety Map & Resources</h1>
+                    <p class="hero-subheading">
+                        View safe spaces, high-risk areas, and find support
+                        services near your location.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/report" class="btn btn-primary"
+                            >Get Help Now</a
+                        >
+                        <a href="/downloads" class="btn btn-secondary"
+                            >Find Resources</a
+                        >
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <i href="/safe.png" class="fas fa-location-arrow"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="map-container" id="map-section">
+            <div class="location-info" id="locationInfo">
+                <i class="fas fa-info-circle"></i>
+                <span id="locationText">Getting your location...</span>
+            </div>
+
+            <div class="map-overlay">
+                <h3 style="margin-top: 0">Quick Actions</h3>
+                <div class="map-actions">
+                    <button
+                        class="map-action-btn"
+                        onclick="window.location.href='/report'"
+                    >
+                        <i
+                            class="fas fa-exclamation-circle map-action-icon"
+                        ></i>
+                        Report an Incident
+                    </button>
+                    <button
+                        class="map-action-btn"
+                        onclick="window.location.href='tel:0800428428'"
+                    >
+                        <i class="fas fa-phone-alt map-action-icon"></i>
+                        Emergency Call
+                    </button>
+                    <button
+                        class="map-action-btn"
+                        onclick="window.location.href='/support'"
+                    >
+                        <i class="fas fa-headset map-action-icon"></i>
+                        Talk to a Counsellor
+                    </button>
+                    <button class="map-action-btn" id="findServicesBtn">
+                        <i class="fas fa-search map-action-icon"></i>
+                        Find Nearby Services
+                    </button>
+                </div>
+            </div>
+
+            <div class="legend">
+                <h4 class="legend-title">Map Legend</h4>
+                <div class="legend-item">
+                    <div
+                        class="legend-color"
+                        style="background-color: #e74c3c"
+                    ></div>
+                    <span class="legend-label">High-Risk Areas</span>
+                </div>
+                <div class="legend-item">
+                    <div
+                        class="legend-color"
+                        style="background-color: #2ecc71"
+                    ></div>
+                    <span class="legend-label">Safe Spaces & Shelters</span>
+                </div>
+                <div class="legend-item">
+                    <div
+                        class="legend-color"
+                        style="background-color: #3498db"
+                    ></div>
+                    <span class="legend-label">Your Location</span>
+                </div>
+                <div class="legend-item">
+                    <div
+                        class="legend-color"
+                        style="background-color: #f39c12"
+                    ></div>
+                    <span class="legend-label">Support Services</span>
+                </div>
+            </div>
+
+            <div id="map"></div>
+        </section>
+
+        <!-- Safety Alerts Section -->
+        <section
+            class="container"
+            id="safety-alerts-section"
+            style="padding: 40px 20px"
+        >
+            <div class="safety-alerts">
+                <div class="alert-header">
+                    <i class="fas fa-exclamation-triangle alert-icon"></i>
+                    <h4 class="alert-title">Safety Alert</h4>
+                </div>
+                <p class="alert-content" id="safetyAlert">
+                    Loading safety information for your area...
+                </p>
+            </div>
+
+            <div class="map-controls">
+                <button class="map-control-btn" id="locateMeBtn">
+                    <i class="fas fa-location-arrow map-control-icon"></i>
+                    Locate Me
+                </button>
+                <button class="map-control-btn" id="showSheltersBtn">
+                    <i class="fas fa-house-damage map-control-icon"></i> Show
+                    Shelters
+                </button>
+                <button class="map-control-btn" id="showRisksBtn">
+                    <i class="fas fa-exclamation-triangle map-control-icon"></i>
+                    Show Risk Areas
+                </button>
+            </div>
+        </section>
+
+        <!-- Emergency CTA Banner -->
+        <section class="cta-banner">
+            <div class="container">
+                <h2 class="cta-heading">Need Immediate Help?</h2>
+                <p class="cta-text">
+                    Contact the GBV Emergency Hotline: 0800 428 428
+                </p>
+                <a href="tel:0800428428" class="btn btn-light">Call Now</a>
+                <a href="sms:34343" class="btn btn-light">SMS HELP</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <a href="index.html" class="footer-logo">SafeSpace</a>
+                        <p class="footer-about">
+                            Providing support, resources, and safe reporting
+                            options for GBV survivors across South Africa.
+                        </p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-links">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/report">Report Incident</a></li>
+                            <li><a href="/downloads">Resources</a></li>
+                            <li><a href="/support">Support</a></li>
+                            <li><a href="/safety">Safety Features</a></li>
+                            <li><a href="/maps">Map</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-contact">
+                        <h3 class="footer-heading">Emergency Contacts</h3>
+                        <p>GBV Emergency Hotline: 0800 428 428</p>
+                        <p>Police Emergency: 10111</p>
+                        <p>SMS Line: 34343</p>
+                        <p>USSD: *134*123#</p>
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>
+                        © 2025 SafeSpace. All rights reserved. |
+                        <a href="#">Privacy Policy</a> |
+                        <a href="#">Terms of Use</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- AI chat (fixed at bottom) -->
+        <div class="chat-container">
+            <div class="chat-button" id="chatToggle">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-window" id="chatWindow">
+                <div class="chat-header">
+                    <h3>SafeSpace Assistant</h3>
+                    <button class="close-chat" id="closeChat">&times;</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        Hi, I'm here to help. How can I assist you today?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Type your question here..."
+                    />
+                    <button id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaflet JS -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="/static/script.js"></script>
+        <script>
+            // Initialize the map
+            let map = L.map("map").setView([-28.4793, 24.6727], 6); // Default center on South Africa
+
+            // Add base tile layer (OpenStreetMap)
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(map);
+
+            // Add user location marker
+            let userMarker = null;
+            let userCircle = null;
+
+            // Sample data for high-risk areas (in real app, this would come from a database)
+            const highRiskAreas = [
+                {
+                    lat: -26.2041,
+                    lng: 28.0473,
+                    name: "Johannesburg CBD",
+                    riskLevel: "High",
+                },
+                {
+                    lat: -33.9249,
+                    lng: 18.4241,
+                    name: "Cape Town Central",
+                    riskLevel: "Medium",
+                },
+                {
+                    lat: -29.8579,
+                    lng: 31.0292,
+                    name: "Durban Central",
+                    riskLevel: "High",
+                },
+                {
+                    lat: -25.7479,
+                    lng: 28.2293,
+                    name: "Pretoria Central",
+                    riskLevel: "Medium",
+                },
+            ];
+
+            // Sample data for safe spaces/shelters
+            const safeSpaces = [
+                {
+                    lat: -26.205,
+                    lng: 28.047,
+                    name: "Johannesburg Safe House",
+                    type: "Shelter",
+                },
+                {
+                    lat: -33.925,
+                    lng: 18.424,
+                    name: "Cape Town Women's Shelter",
+                    type: "Shelter",
+                },
+                {
+                    lat: -29.858,
+                    lng: 31.029,
+                    name: "Durban Safe Haven",
+                    type: "Shelter",
+                },
+                {
+                    lat: -25.748,
+                    lng: 28.229,
+                    name: "Pretoria Support Center",
+                    type: "Counseling",
+                },
+                {
+                    lat: -26.18,
+                    lng: 28.04,
+                    name: "JHB Counseling Services",
+                    type: "Counseling",
+                },
+            ];
+
+            // Function to locate the user
+            function locateUser() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function (position) {
+                            const userLat = position.coords.latitude;
+                            const userLng = position.coords.longitude;
+
+                            // Update map view
+                            map.setView([userLat, userLng], 13);
+
+                            // Remove existing user marker if any
+                            if (userMarker) {
+                                map.removeLayer(userMarker);
+                            }
+                            if (userCircle) {
+                                map.removeLayer(userCircle);
+                            }
+
+                            // Add new user marker
+                            userMarker = L.marker([userLat, userLng])
+                                .addTo(map)
+                                .bindPopup("Your location")
+                                .openPopup();
+
+                            // Add accuracy circle
+                            userCircle = L.circle([userLat, userLng], {
+                                color: "#3498db",
+                                fillColor: "#3498db",
+                                fillOpacity: 0.2,
+                                radius: position.coords.accuracy / 2,
+                            }).addTo(map);
+
+                            // Update location info
+                            document.getElementById(
+                                "locationText"
+                            ).textContent = "Location found";
+
+                            // Update safety alert based on location
+                            updateSafetyAlert(userLat, userLng);
+                        },
+                        function (error) {
+                            console.error("Error getting location:", error);
+                            document.getElementById(
+                                "locationText"
+                            ).textContent = "Unable to get location";
+                            alert(
+                                "Unable to get your location. Please ensure location services are enabled."
+                            );
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 60000,
+                        }
+                    );
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            }
+
+            // Function to update safety alert based on location
+            function updateSafetyAlert(lat, lng) {
+                const alertElement = document.getElementById("safetyAlert");
+                let closestRisk = null;
+                let minDistance = Infinity;
+
+                // Find the closest high-risk area
+                highRiskAreas.forEach((area) => {
+                    const distance = getDistance(lat, lng, area.lat, area.lng);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestRisk = area;
+                    }
+                });
+
+                // Generate appropriate alert message
+                if (minDistance < 5) {
+                    // Within 5km of a high-risk area
+                    alertElement.innerHTML = `<strong>You are near a high-risk area (${closestRisk.name}).</strong> 
+                    Please be cautious, stay in well-lit areas, and avoid walking alone after dark.`;
+                } else if (minDistance < 15) {
+                    // Within 15km of a high-risk area
+                    alertElement.innerHTML = `You are within ${Math.round(
+                        minDistance
+                    )}km of a high-risk area. 
+                    Stay aware of your surroundings and keep emergency contacts accessible.`;
+                } else {
+                    alertElement.innerHTML = `No high-risk areas detected nearby. 
+                    Always remain vigilant and aware of your surroundings.`;
+                }
+            }
+
+            // Helper function to calculate distance between two coordinates
+            function getDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Earth's radius in km
+                const dLat = deg2rad(lat2 - lat1);
+                const dLon = deg2rad(lon2 - lon1);
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(deg2rad(lat1)) *
+                        Math.cos(deg2rad(lat2)) *
+                        Math.sin(dLon / 2) *
+                        Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const distance = R * c; // Distance in km
+                return distance;
+            }
+
+            function deg2rad(deg) {
+                return deg * (Math.PI / 180);
+            }
+
+            // Function to show high-risk areas on the map
+            function showRiskAreas() {
+                // Clear existing risk markers
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Circle) {
+                        const radius = layer.options.radius;
+                        // Check if it's a risk area circle (not user accuracy circle)
+                        if (radius === 1000 || radius === 800) {
+                            map.removeLayer(layer);
+                        }
+                    }
+                });
+
+                // Add high-risk areas
+                highRiskAreas.forEach((area) => {
+                    const riskColor =
+                        area.riskLevel === "High" ? "#e74c3c" : "#f39c12";
+                    const riskRadius = area.riskLevel === "High" ? 1000 : 800;
+
+                    L.circle([area.lat, area.lng], {
+                        color: riskColor,
+                        fillColor: riskColor,
+                        fillOpacity: 0.3,
+                        radius: riskRadius,
+                    })
+                        .addTo(map)
+                        .bindPopup(
+                            `<strong>${area.name}</strong><br>Risk Level: ${area.riskLevel}`
+                        );
+                });
+            }
+
+            // Function to show safe spaces on the map
+            function showSafeSpaces() {
+                // Clear existing safe space markers
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Marker && layer !== userMarker) {
+                        map.removeLayer(layer);
+                    }
+                });
+
+                // Add safe spaces
+                safeSpaces.forEach((space) => {
+                    const spaceIcon = L.icon({
+                        iconUrl:
+                            "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+                        shadowUrl:
+                            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41],
+                    });
+
+                    L.marker([space.lat, space.lng], { icon: spaceIcon })
+                        .addTo(map)
+                        .bindPopup(
+                            `<strong>${space.name}</strong><br>Type: ${space.type}`
+                        );
+                });
+            }
+
+            // Function to find nearby services
+            function findNearbyServices() {
+                if (!userMarker) {
+                    alert(
+                        "Please enable location services first to find nearby services."
+                    );
+                    locateUser();
+                    return;
+                }
+
+                const userLat = userMarker.getLatLng().lat;
+                const userLng = userMarker.getLatLng().lng;
+
+                // Clear existing markers
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Marker && layer !== userMarker) {
+                        map.removeLayer(layer);
+                    }
+                });
+
+                // Add safe spaces within 10km
+                safeSpaces.forEach((space) => {
+                    const distance = getDistance(
+                        userLat,
+                        userLng,
+                        space.lat,
+                        space.lng
+                    );
+                    if (distance <= 10) {
+                        const spaceIcon = L.icon({
+                            iconUrl:
+                                "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+                            shadowUrl:
+                                "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41],
+                        });
+
+                        L.marker([space.lat, space.lng], { icon: spaceIcon })
+                            .addTo(map)
+                            .bindPopup(
+                                `<strong>${space.name}</strong><br>Type: ${
+                                    space.type
+                                }<br>Distance: ${Math.round(distance)}km`
+                            );
+                    }
+                });
+
+                alert(`Showing safe spaces within 10km of your location.`);
+            }
+
+            // Event listeners
+            document
+                .getElementById("locateMeBtn")
+                .addEventListener("click", locateUser);
+            document
+                .getElementById("showRisksBtn")
+                .addEventListener("click", showRiskAreas);
+            document
+                .getElementById("showSheltersBtn")
+                .addEventListener("click", showSafeSpaces);
+            document
+                .getElementById("findServicesBtn")
+                .addEventListener("click", findNearbyServices);
+
+            // Initialize the map with some data
+            window.addEventListener("load", function () {
+                // Add some sample high-risk areas
+                showRiskAreas();
+
+                // Try to locate the user
+                locateUser();
+            });
+        </script>
+    </body>
+</html>

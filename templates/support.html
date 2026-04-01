@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Get Support - SafeSpace</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="/static/styles.css" />
+        <style>
+            /* Additional styles specific to the support page */
+            .support-hero {
+                background: linear-gradient(
+                    135deg,
+                    var(--primary-color) 0%,
+                    #6c3483 100%
+                );
+                color: var(--white);
+                padding: 140px 0 80px; /* Increased top padding to account for fixed navbar */
+                text-align: center;
+                margin-top: 80px; /* Added margin to push content below fixed header */
+            }
+
+            .support-options {
+                padding: 80px 0;
+            }
+
+            .support-card {
+                background: var(--white);
+                border-radius: 10px;
+                padding: 30px;
+                margin-bottom: 30px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+                transition: var(--transition);
+            }
+
+            .support-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .support-card-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .support-icon {
+                width: 60px;
+                height: 60px;
+                background: var(--light-gray);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 20px;
+                color: var(--primary-color);
+                font-size: 1.5rem;
+            }
+
+            .support-card-title {
+                font-size: 1.5rem;
+                margin: 0;
+                color: var(--dark-gray);
+            }
+
+            .counsellor-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
+                margin-top: 30px;
+            }
+
+            .counsellor-card {
+                background: var(--white);
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+                transition: var(--transition);
+            }
+
+            .counsellor-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .counsellor-img {
+                height: 200px;
+                background-color: var(--light-gray);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--primary-color);
+                font-size: 3rem;
+            }
+
+            .counsellor-info {
+                padding: 20px;
+            }
+
+            .counsellor-name {
+                font-size: 1.3rem;
+                margin-bottom: 10px;
+                color: var(--dark-gray);
+            }
+
+            .counsellor-specialty {
+                color: var(--primary-color);
+                font-weight: 600;
+                margin-bottom: 15px;
+                display: block;
+            }
+
+            .counsellor-languages {
+                margin: 15px 0;
+            }
+
+            .language-tag {
+                display: inline-block;
+                background-color: var(--light-gray);
+                padding: 5px 10px;
+                border-radius: 15px;
+                margin: 0 5px 5px 0;
+                font-size: 0.8rem;
+            }
+
+            .schedule-btn {
+                width: 100%;
+                text-align: center;
+                margin-top: 15px;
+            }
+
+            .faq-container {
+                margin-top: 50px;
+            }
+
+            .faq-item {
+                margin-bottom: 20px;
+                border: 1px solid #eee;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .faq-question {
+                padding: 20px;
+                background: var(--light-gray);
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .faq-answer {
+                padding: 0 20px;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease, padding 0.3s ease;
+            }
+
+            .faq-item.active .faq-answer {
+                max-height: 500px;
+                padding: 20px;
+            }
+
+            .faq-item.active .faq-toggle i {
+                transform: rotate(180deg);
+            }
+
+            .faq-toggle {
+                transition: transform 0.3s ease;
+            }
+
+            .community-guidelines {
+                background: var(--light-gray);
+                padding: 30px;
+                border-radius: 10px;
+                margin: 40px 0;
+            }
+
+            .guidelines-list {
+                margin-left: 20px;
+                margin-bottom: 20px;
+            }
+
+            .guidelines-list li {
+                margin-bottom: 10px;
+            }
+
+            .emergency-contact-box {
+                background: rgba(231, 76, 60, 0.1);
+                border-left: 4px solid var(--emergency-color);
+                padding: 20px;
+                border-radius: 5px;
+                margin: 30px 0;
+            }
+
+            @media (max-width: 768px) {
+                .support-hero {
+                    padding: 120px 0 60px; /* Adjusted for mobile */
+                    margin-top: 70px; /* Adjusted for mobile */
+                }
+
+                .counsellor-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .support-card-header {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .support-icon {
+                    margin-right: 0;
+                    margin-bottom: 15px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Header / Navigation -->
+        <header id="header">
+            <div class="container nav-container">
+                <a href="index.html" class="logo">
+                    <img
+                        src="/static/images/safe.png"
+                        alt="SafeSpace Logo"
+                        class="safe-logo"
+                    />
+                </a>
+
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/report" class="nav-link">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safetydirectory" class="nav-link"
+                            >Safety Directory</a
+                        >
+                    </li>
+                    <li class="nav-item">
+                        <a href="/downloads" class="nav-link">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/support" class="nav-link">Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safety" class="nav-link">Safety</a>
+                    </li>
+                    <li class="nav-item nav-cta">
+                        <button
+                            class="btn btn-emergency"
+                            onclick="triggerEmergency()"
+                        >
+                            Emergency Help
+                        </button>
+                    </li>
+
+                    <script>
+                        async function triggerEmergency() {
+                            if (!navigator.geolocation) {
+                                alert(
+                                    "Geolocation is not supported by your browser."
+                                );
+                                return;
+                            }
+
+                            navigator.geolocation.getCurrentPosition(
+                                async (position) => {
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+
+                                    // Reverse geocode: get human-readable address from coordinates
+                                    let address = `Lat: ${lat}, Lon: ${lon}`;
+                                    try {
+                                        const geoRes = await fetch(
+                                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+                                        );
+                                        const geoData = await geoRes.json();
+                                        if (geoData.display_name) {
+                                            address = geoData.display_name;
+                                        }
+                                    } catch (err) {
+                                        console.error(
+                                            "Reverse geocoding failed:",
+                                            err
+                                        );
+                                    }
+
+                                    // Emergency message with location
+                                    const emergencyNumber = "+27612028093";
+                                    const emergencyMessage = `🚨 EMERGENCY ALERT: A user needs immediate help!\n📍 Location: ${address}\n🔗 Maps: https://www.google.com/maps?q=${lat},${lon}`;
+
+                                    // Send to Flask backend -> Africa's Talking
+                                    fetch("/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type":
+                                                "application/x-www-form-urlencoded",
+                                        },
+                                        body: `number=${encodeURIComponent(
+                                            emergencyNumber
+                                        )}&message=${encodeURIComponent(
+                                            emergencyMessage
+                                        )}`,
+                                    })
+                                        .then((response) => response.text())
+                                        .then((data) => {
+                                            alert(
+                                                "✅ Emergency alert with live location sent!"
+                                            );
+                                            console.log(
+                                                "Server response:",
+                                                data
+                                            );
+                                        })
+                                        .catch((error) => {
+                                            alert(
+                                                "❌ Failed to send emergency alert."
+                                            );
+                                            console.error("Error:", error);
+                                        });
+                                },
+                                () => {
+                                    alert("⚠️ Unable to retrieve location.");
+                                }
+                            );
+                        }
+                    </script>
+
+                    <li class="nav-item quick-exit">
+                        <a
+                            href="https://www.google.com/search?client=firefox-b-d&q=famous+tik+tok+dances+2025"
+                            class="btn btn-emergency"
+                            >Quick Exit</a
+                        >
+                    </li>
+                </ul>
+
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-heading">Get the Support You Deserve</h1>
+                    <p class="hero-subheading">
+                        Connect with trained professionals, join a supportive
+                        community, and access resources to help you heal and
+                        recover.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#counsellors" class="btn btn-primary"
+                            >Talk to a Counsellor</a
+                        >
+                        <a href="#community" class="btn btn-secondary"
+                            >Join Community</a
+                        >
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <i href="/safe.png" class="fas fa-users"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Support Options Section -->
+        <section class="support-options" id="support-options">
+            <div class="container">
+                <h2 class="section-title">Ways to Get Support</h2>
+
+                <div class="support-card">
+                    <div class="support-card-header">
+                        <div class="support-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3 class="support-card-title">Chatbot Support</h3>
+                    </div>
+                    <p>
+                        Our AI assistant can provide immediate guidance,
+                        resources, and information in multiple languages. It's
+                        available 24/7 for whenever you need support.
+                    </p>
+                    <div class="language-options">
+                        <span class="language-tag">English</span>
+                        <span class="language-tag">isiZulu</span>
+                        <span class="language-tag">Afrikaans</span>
+                        <span class="language-tag">isiXhosa</span>
+                        <span class="language-tag">Sesotho</span>
+                    </div>
+                    <a href="#chat" class="btn btn-primary">Start Chat Now</a>
+                </div>
+
+                <div class="support-card">
+                    <div class="support-card-header">
+                        <div class="support-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3 class="support-card-title">
+                            Professional Counselling
+                        </h3>
+                    </div>
+                    <p>
+                        Connect with certified trauma counsellors and
+                        psychologists who specialize in supporting GBV
+                        survivors. Sessions available via phone, video call, or
+                        in-person.
+                    </p>
+                    <ul>
+                        <li>One-on-one therapy sessions</li>
+                        <li>Trauma-informed care</li>
+                        <li>Crisis intervention</li>
+                        <li>Long-term support plans</li>
+                    </ul>
+                    <a href="#counsellors" class="btn btn-primary"
+                        >View Counsellors</a
+                    >
+                </div>
+
+                <div class="support-card">
+                    <div class="support-card-header">
+                        <div class="support-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="support-card-title">Support Community</h3>
+                    </div>
+                    <p>
+                        Join our safe, moderated online community to connect
+                        with other survivors, share experiences, and find
+                        strength in solidarity.
+                    </p>
+                    <div class="community-guidelines">
+                        <h4>Community Guidelines:</h4>
+                        <ul class="guidelines-list">
+                            <li>Respect everyone's privacy and experiences</li>
+                            <li>No judgment or victim-blaming</li>
+                            <li>Share only what you're comfortable with</li>
+                            <li>Be kind and supportive to others</li>
+                            <li>
+                                Respect different perspectives and experiences
+                            </li>
+                        </ul>
+                        <p>
+                            Our community is moderated 24/7 to ensure a safe
+                            environment for all members.
+                        </p>
+                    </div>
+                    <a href="#community" class="btn btn-primary"
+                        >Join Community</a
+                    >
+                </div>
+
+                <div class="support-card">
+                    <div class="support-card-header">
+                        <div class="support-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3 class="support-card-title">Peer Support Program</h3>
+                    </div>
+                    <p>
+                        Connect with trained peer supporters who have personal
+                        experience with GBV recovery and can offer empathy,
+                        understanding, and practical guidance.
+                    </p>
+                    <p>
+                        Our peer supporters are trained in active listening,
+                        crisis management, and resource navigation to provide
+                        you with the best possible support.
+                    </p>
+                    <a href="#peer-support" class="btn btn-primary"
+                        >Find a Peer Supporter</a
+                    >
+                </div>
+            </div>
+        </section>
+
+        <!-- Counsellors Section -->
+        <section class="about" id="counsellors">
+            <div class="container">
+                <h2 class="section-title">
+                    Our Counsellors & Support Professionals
+                </h2>
+                <p class="text-center">
+                    All our professionals are certified and experienced in
+                    trauma-informed care for GBV survivors.
+                </p>
+
+                <div class="counsellor-grid">
+                    <div class="counsellor-card">
+                        <div class="counsellor-img">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="counsellor-info">
+                            <h3 class="counsellor-name">Dr. Nomsa Khumalo</h3>
+                            <span class="counsellor-specialty"
+                                >Clinical Psychologist</span
+                            >
+                            <p>
+                                Specializing in trauma recovery and PTSD
+                                treatment with over 10 years of experience
+                                supporting GBV survivors.
+                            </p>
+                            <div class="counsellor-languages">
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">isiZulu</span>
+                            </div>
+                            <a href="#" class="btn btn-outline schedule-btn"
+                                >Schedule Session</a
+                            >
+                        </div>
+                    </div>
+
+                    <div class="counsellor-card">
+                        <div class="counsellor-img">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="counsellor-info">
+                            <h3 class="counsellor-name">Sarah van der Merwe</h3>
+                            <span class="counsellor-specialty"
+                                >Trauma Counsellor</span
+                            >
+                            <p>
+                                Focused on empowerment and rebuilding
+                                self-esteem after abusive relationships.
+                            </p>
+                            <div class="counsellor-languages">
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">Afrikaans</span>
+                            </div>
+                            <a href="#" class="btn btn-outline schedule-btn"
+                                >Schedule Session</a
+                            >
+                        </div>
+                    </div>
+
+                    <div class="counsellor-card">
+                        <div class="counsellor-img">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="counsellor-info">
+                            <h3 class="counsellor-name">Lerato Moloi</h3>
+                            <span class="counsellor-specialty"
+                                >Social Worker</span
+                            >
+                            <p>
+                                Specializes in practical support, resource
+                                navigation, and legal advocacy for GBV
+                                survivors.
+                            </p>
+                            <div class="counsellor-languages">
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">Sesotho</span>
+                                <span class="language-tag">isiXhosa</span>
+                            </div>
+                            <a href="#" class="btn btn-outline schedule-btn"
+                                >Schedule Session</a
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center" style="margin-top: 40px">
+                    <a href="#" class="btn btn-primary"
+                        >View All Professionals</a
+                    >
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="features" id="faq">
+            <div class="container">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Is the support confidential?
+                            <span class="faq-toggle"
+                                ><i class="fas fa-chevron-down"></i
+                            ></span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>
+                                Yes, all support services are completely
+                                confidential. Your information will not be
+                                shared with anyone without your explicit
+                                consent, except in situations where we are
+                                legally required to report (such as imminent
+                                risk of harm to yourself or others).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            How much does counselling cost?
+                            <span class="faq-toggle"
+                                ><i class="fas fa-chevron-down"></i
+                            ></span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>
+                                We offer a sliding scale fee structure based on
+                                your financial situation. Many of our services
+                                are free, and we can connect you with additional
+                                resources if needed. No one is turned away due
+                                to inability to pay.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            How quickly can I get an appointment?
+                            <span class="faq-toggle"
+                                ><i class="fas fa-chevron-down"></i
+                            ></span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>
+                                We strive to offer crisis support within 24
+                                hours and regular counselling appointments
+                                within a week. Our chatbot and peer support are
+                                available immediately.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Can I choose a counsellor of a specific gender?
+                            <span class="faq-toggle"
+                                ><i class="fas fa-chevron-down"></i
+                            ></span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>
+                                Yes, we understand that gender preferences are
+                                important in the healing process. You can
+                                specify your preference when booking, and we
+                                will match you with an appropriate counsellor.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            What if I need help outside of business hours?
+                            <span class="faq-toggle"
+                                ><i class="fas fa-chevron-down"></i
+                            ></span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>
+                                Our chatbot is available 24/7, and we have an
+                                emergency hotline for crisis situations after
+                                hours. You can also schedule appointments for
+                                evenings and weekends with some of our
+                                counsellors.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="emergency-contact-box">
+                    <h3>
+                        <i class="fas fa-exclamation-circle"></i> Immediate
+                        Crisis Support
+                    </h3>
+                    <p>
+                        If you're in crisis and need immediate help, please
+                        contact:
+                    </p>
+                    <p>GBV Emergency Hotline: <strong>0800 428 428</strong></p>
+                    <p>Police Emergency: <strong>10111</strong></p>
+                    <p>SMS Line: <strong>34343</strong> (Text "HELP")</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency CTA Banner -->
+        <section class="cta-banner">
+            <div class="container">
+                <h2 class="cta-heading">Need Immediate Help?</h2>
+                <p class="cta-text">
+                    Contact the GBV Emergency Hotline: 0800 428 428
+                </p>
+                <a href="tel:0800428428" class="btn btn-light">Call Now</a>
+                <a href="sms:34343" class="btn btn-light">SMS HELP</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <a href="index.html" class="footer-logo">SafeSpace</a>
+                        <p class="footer-about">
+                            Providing support, resources, and safe reporting
+                            options for GBV survivors across South Africa.
+                        </p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-links">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/report">Report Incident</a></li>
+                            <li><a href="/downloads">Resources</a></li>
+                            <li><a href="/support">Support</a></li>
+                            <li>
+                                <a href="/safety">Safety Features</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-contact">
+                        <h3 class="footer-heading">Emergency Contacts</h3>
+                        <p>GBV Emergency Hotline: 0800 428 428</p>
+                        <p>Police Emergency: 10111</p>
+                        <p>SMS Line: 34343</p>
+                        <p>USSD: *134*123#</p>
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>
+                        © 2025 SafeSpace. All rights reserved. |
+                        <a href="#">Privacy Policy</a> |
+                        <a href="#">Terms of Use</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- AI chat (fixed at bottom) -->
+        <div class="chat-container">
+            <div class="chat-button" id="chatToggle">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-window" id="chatWindow">
+                <div class="chat-header">
+                    <h3>SafeSpace Assistant</h3>
+                    <button class="close-chat" id="closeChat">&times;</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        Hi, I'm here to help. How can I assist you today?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Type your question here..."
+                    />
+                    <button id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/script.js"></script>
+        <script>
+            // FAQ toggle functionality
+            document.addEventListener("DOMContentLoaded", function () {
+                const faqItems = document.querySelectorAll(".faq-item");
+
+                faqItems.forEach((item) => {
+                    const question = item.querySelector(".faq-question");
+
+                    question.addEventListener("click", () => {
+                        item.classList.toggle("active");
+                    });
+                });
+
+                // Smooth scrolling for anchor links
+                document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                    anchor.addEventListener("click", function (e) {
+                        e.preventDefault();
+
+                        const targetId = this.getAttribute("href");
+                        if (targetId === "#") return;
+
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 100,
+                                behavior: "smooth",
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

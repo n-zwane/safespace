@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SafeSpace - Supporting GBV Survivors Across South Africa</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="/static/styles.css" />
+    </head>
+    <body>
+        <!-- Header / Navigation -->
+        <header id="header">
+            <div class="container nav-container">
+                <a href="#" class="logo">
+                    <img
+                        src="/static/images/safe.png"
+                        alt="SafeSpace Logo"
+                        class="safe-logo"
+                    />
+                </a>
+
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/report" class="nav-link">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safetydirectory" class="nav-link"
+                            >Safety Directory</a
+                        >
+                    </li>
+                    <li class="nav-item">
+                        <a href="/downloads" class="nav-link">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/support" class="nav-link">Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safety" class="nav-link">Safety</a>
+                    </li>
+                    <li class="nav-item nav-cta">
+                        <button
+                            class="btn btn-emergency"
+                            onclick="triggerEmergency()"
+                        >
+                            Emergency Help
+                        </button>
+                    </li>
+
+                    <script>
+                        async function triggerEmergency() {
+                            if (!navigator.geolocation) {
+                                alert(
+                                    "Geolocation is not supported by your browser."
+                                );
+                                return;
+                            }
+
+                            navigator.geolocation.getCurrentPosition(
+                                async (position) => {
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+
+                                    // Reverse geocode: get human-readable address from coordinates
+                                    let address = `Lat: ${lat}, Lon: ${lon}`;
+                                    try {
+                                        const geoRes = await fetch(
+                                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+                                        );
+                                        const geoData = await geoRes.json();
+                                        if (geoData.display_name) {
+                                            address = geoData.display_name;
+                                        }
+                                    } catch (err) {
+                                        console.error(
+                                            "Reverse geocoding failed:",
+                                            err
+                                        );
+                                    }
+
+                                    // Emergency message with location
+                                    const emergencyNumber = "+27612028093";
+                                    const emergencyMessage = `🚨 EMERGENCY ALERT: A user needs immediate help!\n📍 Location: ${address}\n🔗 Maps: https://www.google.com/maps?q=${lat},${lon}`;
+
+                                    // Send to Flask backend -> Africa's Talking
+                                    fetch("/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type":
+                                                "application/x-www-form-urlencoded",
+                                        },
+                                        body: `number=${encodeURIComponent(
+                                            emergencyNumber
+                                        )}&message=${encodeURIComponent(
+                                            emergencyMessage
+                                        )}`,
+                                    })
+                                        .then((response) => response.text())
+                                        .then((data) => {
+                                            alert(
+                                                "✅ Emergency alert with live location sent!"
+                                            );
+                                            console.log(
+                                                "Server response:",
+                                                data
+                                            );
+                                        })
+                                        .catch((error) => {
+                                            alert(
+                                                "❌ Failed to send emergency alert."
+                                            );
+                                            console.error("Error:", error);
+                                        });
+                                },
+                                () => {
+                                    alert("⚠️ Unable to retrieve location.");
+                                }
+                            );
+                        }
+                    </script>
+
+                    <li class="nav-item quick-exit">
+                        <a
+                            href="https://www.google.com/search?client=firefox-b-d&q=famous+tik+tok+dances+2025"
+                            class="btn btn-emergency"
+                            >Quick Exit</a
+                        >
+                    </li>
+                </ul>
+
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-heading">
+                        SafeSpace: Support for GBV Survivors Across South Africa
+                    </h1>
+                    <p class="hero-subheading">
+                        A safe, accessible platform providing resources,
+                        reporting, and support for survivors of gender-based
+                        violence, even with limited connectivity.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/report" class="btn btn-primary"
+                            >Get Help Now</a
+                        >
+                        <a href="/downloads" class="btn btn-secondary"
+                            >Find Resources</a
+                        >
+                    </div>
+                    <div class="connectivity-options">
+                        <p>
+                            Also available via:
+                            <a href="#" class="sms-link">SMS</a> |
+                            <a href="#" class="ussd-link">USSD</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <i href="/safe.png" class="fas fa-hands-helping"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reporting Section -->
+        <section class="about" id="reporting">
+            <div class="container">
+                <h2 class="section-title">Safe Reporting Options</h2>
+                <p class="text-center">
+                    Multiple ways to report incidents safely, even with limited
+                    connectivity or literacy.
+                </p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="feature-title">USSD Reporting</h3>
+                        <p>
+                            Dial SafeSpace USSD to report incidents safely,
+                            choose language, and access support without
+                            internet, for free.
+                        </p>
+                        <a href="tel:*483#" class="btn btn-primary"
+                            >Report via USSD</a
+                        >
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-sms"></i>
+                        </div>
+                        <h3 class="feature-title">SMS Reporting</h3>
+                        <p>
+                            Text "HELP and [your location]" and press Send SMS
+                            to receive a call from the local police immediately.
+                            No data required.
+                        </p>
+                        <form id="smsForm" action="/send" method="post">
+                            <input
+                                type="text"
+                                name="number"
+                                placeholder="Enter your number"
+                                required
+                            />
+                            <input
+                                type="text"
+                                name="message"
+                                id="smsMessage"
+                                placeholder="Type your message here"
+                                required
+                            />
+                            <button type="submit" class="btn btn-primary">
+                                Report via SMS
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <h3 class="feature-title">Online Form</h3>
+                        <p>
+                            Secure online reporting with option to remain
+                            anonymous or provide contact details.
+                        </p>
+                        <a href="/report" class="btn btn-primary">Report Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section class="features resources-section" id="resources">
+            <div class="container">
+                <h2 class="section-title">Immediate Resources & Help</h2>
+
+                <div class="features-container">
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-house-damage"></i>
+                        </div>
+                        <h3>Find Shelters & Safe Spaces</h3>
+                        <p>
+                            Locate nearby shelters, safe houses, and emergency
+                            accommodation across South Africa.
+                        </p>
+                        <a href="/shelters" class="btn btn-outline"
+                            >Find Shelters</a
+                        >
+                    </div>
+
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-file-download"></i>
+                        </div>
+                        <h3>Download Resources</h3>
+                        <p>
+                            Access and download PDF guides, rights information,
+                            and contact lists for offline use.
+                        </p>
+                        <a href="/downloads" class="btn btn-outline"
+                            >Download Now</a
+                        >
+                    </div>
+
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h3>High-Risk Area Map</h3>
+                        <p>
+                            View areas with reported high incidence of GBV to
+                            enhance safety awareness (data anonymized).
+                        </p>
+                        <a href="/maps" class="btn btn-outline">View Map</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Support Section -->
+        <section class="team" id="support">
+            <div class="container">
+                <h2 class="section-title">Get Support</h2>
+
+                <div class="team-grid">
+                    <div class="support-option">
+                        <div class="support-img">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="support-info">
+                            <h3 class="support-name">Chatbot Support</h3>
+                            <p class="support-desc">
+                                Get immediate guidance in multiple languages on
+                                what to do next and available resources.
+                            </p>
+                            <div class="language-options">
+                                <span class="language-tag">English</span>
+                                <span class="language-tag">isiZulu</span>
+                                <span class="language-tag">Afrikaans</span>
+                            </div>
+                            <a href="chat.html" class="btn btn-primary"
+                                >Start Chat</a
+                            >
+                        </div>
+                    </div>
+
+                    <div class="support-option">
+                        <div class="support-img">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="support-info">
+                            <h3 class="support-name">Counsellor Connection</h3>
+                            <p class="support-desc">
+                                Schedule sessions with certified counsellors and
+                                support professionals (coming soon).
+                            </p>
+                            <a href="#" class="btn btn-primary">Learn More</a>
+                        </div>
+                    </div>
+
+                    <div class="support-option">
+                        <div class="support-img">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="support-info">
+                            <h3 class="support-name">Community Support</h3>
+                            <p class="support-desc">
+                                Connect with other survivors in a moderated,
+                                safe community space (coming soon).
+                            </p>
+                            <a href="#" class="btn btn-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Features Section -->
+        <section class="features" id="safety">
+            <div class="container">
+                <h2 class="section-title">Safety & Privacy Features</h2>
+
+                <div class="features-container">
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <h3>Quick Exit</h3>
+                        <p>
+                            Immediately hide the app and redirect to a neutral
+                            website with a single click.
+                        </p>
+                    </div>
+
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3>Disguised Interface</h3>
+                        <p>
+                            App appears as a notes or health app to maintain
+                            privacy and safety.
+                        </p>
+                    </div>
+
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Data Protection</h3>
+                        <p>
+                            All data is encrypted and stored securely with
+                            strict access controls.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency CTA Banner -->
+        <section class="cta-banner">
+            <div class="container">
+                <h2 class="cta-heading">Need Immediate Help?</h2>
+                <p class="cta-text">
+                    Contact the GBV Emergency Hotline: (+27)61 202 8093
+                </p>
+                <a href="tel:+27612028093" class="btn btn-light">Call Now</a>
+                <a href="tel:*384*7427#" class="btn btn-light">SMS HELP</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <a href="#" class="footer-logo">SafeSpace</a>
+                        <p class="footer-about">
+                            Providing support, resources, and safe reporting
+                            options for GBV survivors across South Africa.
+                        </p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-links">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/report">Report Incident</a></li>
+                            <li><a href="/downloads">Resources</a></li>
+                            <li><a href="/support">Support</a></li>
+                            <li><a href="/safety">Safety Features</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-contact">
+                        <h3 class="footer-heading">Emergency Contacts</h3>
+                        <p>GBV Emergency Hotline: 0800 428 428</p>
+                        <p>Police Emergency: 10111</p>
+                        <p>SMS Line: 34343</p>
+                        <p>USSD: *134*123#</p>
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>
+                        © 2025 SafeSpace. All rights reserved. |
+                        <a href="#">Privacy Policy</a> |
+                        <a href="#">Terms of Use</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- AI chat (fixed at bottom) -->
+        <div class="chat-container">
+            <div class="chat-button" id="chatToggle">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-window" id="chatWindow">
+                <div class="chat-header">
+                    <h3>SafeSpace Assistant</h3>
+                    <button class="close-chat" id="closeChat">&times;</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        Hi, I'm here to help. How can I assist you today?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Type your question here..."
+                    />
+                    <button id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/script.js"></script>
+    </body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Safety Features - SafeSpace</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="/static/styles.css" />
+        <style>
+            /* Additional styles specific to the safety page */
+            .safety-hero {
+                background: linear-gradient(
+                    135deg,
+                    var(--primary-color) 0%,
+                    #6c3483 100%
+                );
+                color: var(--white);
+                padding: 140px 0 80px;
+                text-align: center;
+                margin-top: 80px;
+            }
+
+            .safety-features {
+                padding: 80px 0;
+            }
+
+            .safety-card {
+                background: var(--white);
+                border-radius: 10px;
+                padding: 30px;
+                margin-bottom: 30px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+                transition: var(--transition);
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .safety-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .safety-card-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .safety-icon {
+                width: 60px;
+                height: 60px;
+                background: var(--light-gray);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 20px;
+                color: var(--primary-color);
+                font-size: 1.5rem;
+            }
+
+            .safety-card-title {
+                font-size: 1.5rem;
+                margin: 0;
+                color: var(--dark-gray);
+            }
+
+            .safety-tips-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
+                margin-top: 50px;
+            }
+
+            .safety-tip-card {
+                background: var(--white);
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+                transition: var(--transition);
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .safety-tip-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .tip-img {
+                height: 160px;
+                background-color: var(--light-gray);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--primary-color);
+                font-size: 2.5rem;
+            }
+
+            .tip-info {
+                padding: 20px;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .tip-title {
+                font-size: 1.3rem;
+                margin-bottom: 10px;
+                color: var(--dark-gray);
+            }
+
+            .tip-desc {
+                margin-bottom: 15px;
+                flex-grow: 1;
+            }
+
+            .safety-planning {
+                background-color: var(--light-gray);
+                padding: 60px 0;
+            }
+
+            .plan-steps {
+                counter-reset: step-counter;
+                margin: 40px 0;
+            }
+
+            .plan-step {
+                position: relative;
+                padding: 25px 25px 25px 80px;
+                margin-bottom: 20px;
+                background: var(--white);
+                border-radius: 8px;
+                box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+            }
+
+            .plan-step:before {
+                counter-increment: step-counter;
+                content: counter(step-counter);
+                position: absolute;
+                left: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 40px;
+                height: 40px;
+                background: var(--primary-color);
+                color: var(--white);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+
+            .quick-exit-demo {
+                text-align: center;
+                padding: 40px;
+                background: var(--white);
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+                margin: 40px 0;
+            }
+
+            .disguise-demo {
+                text-align: center;
+                padding: 40px;
+                background: var(--white);
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+                margin: 40px 0;
+            }
+
+            .keyboard-shortcut {
+                display: inline-block;
+                padding: 5px 10px;
+                background: var(--light-gray);
+                border-radius: 4px;
+                font-family: monospace;
+                margin: 0 5px;
+            }
+
+            @media (max-width: 768px) {
+                .safety-hero {
+                    padding: 120px 0 60px;
+                    margin-top: 70px;
+                }
+
+                .safety-tips-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .safety-card-header {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .safety-icon {
+                    margin-right: 0;
+                    margin-bottom: 15px;
+                }
+
+                .plan-step {
+                    padding: 60px 20px 20px 20px;
+                }
+
+                .plan-step:before {
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Header / Navigation -->
+        <header id="header">
+            <div class="container nav-container">
+                <a href="index.html" class="logo">
+                    <img
+                        src="/static/images/safe.png"
+                        alt="SafeSpace Logo"
+                        class="safe-logo"
+                    />
+                </a>
+
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/report" class="nav-link">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safetydirectory" class="nav-link"
+                            >Safety Directory</a
+                        >
+                    </li>
+                    <li class="nav-item">
+                        <a href="/downloads" class="nav-link">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/support" class="nav-link">Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safety" class="nav-link">Safety</a>
+                    </li>
+                    <li class="nav-item nav-cta">
+                        <button
+                            class="btn btn-emergency"
+                            onclick="triggerEmergency()"
+                        >
+                            Emergency Help
+                        </button>
+                    </li>
+
+                    <script>
+                        async function triggerEmergency() {
+                            if (!navigator.geolocation) {
+                                alert(
+                                    "Geolocation is not supported by your browser."
+                                );
+                                return;
+                            }
+
+                            navigator.geolocation.getCurrentPosition(
+                                async (position) => {
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+
+                                    // Reverse geocode: get human-readable address from coordinates
+                                    let address = `Lat: ${lat}, Lon: ${lon}`;
+                                    try {
+                                        const geoRes = await fetch(
+                                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+                                        );
+                                        const geoData = await geoRes.json();
+                                        if (geoData.display_name) {
+                                            address = geoData.display_name;
+                                        }
+                                    } catch (err) {
+                                        console.error(
+                                            "Reverse geocoding failed:",
+                                            err
+                                        );
+                                    }
+
+                                    // Emergency message with location
+                                    const emergencyNumber = "+27612028093";
+                                    const emergencyMessage = `🚨 EMERGENCY ALERT: A user needs immediate help!\n📍 Location: ${address}\n🔗 Maps: https://www.google.com/maps?q=${lat},${lon}`;
+
+                                    // Send to Flask backend -> Africa's Talking
+                                    fetch("/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type":
+                                                "application/x-www-form-urlencoded",
+                                        },
+                                        body: `number=${encodeURIComponent(
+                                            emergencyNumber
+                                        )}&message=${encodeURIComponent(
+                                            emergencyMessage
+                                        )}`,
+                                    })
+                                        .then((response) => response.text())
+                                        .then((data) => {
+                                            alert(
+                                                "✅ Emergency alert with live location sent!"
+                                            );
+                                            console.log(
+                                                "Server response:",
+                                                data
+                                            );
+                                        })
+                                        .catch((error) => {
+                                            alert(
+                                                "❌ Failed to send emergency alert."
+                                            );
+                                            console.error("Error:", error);
+                                        });
+                                },
+                                () => {
+                                    alert("⚠️ Unable to retrieve location.");
+                                }
+                            );
+                        }
+                    </script>
+
+                    <li class="nav-item quick-exit">
+                        <a
+                            href="https://www.google.com/search?client=firefox-b-d&q=famous+tik+tok+dances+2025"
+                            class="btn btn-emergency"
+                            >Quick Exit</a
+                        >
+                    </li>
+                </ul>
+
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-heading">Your Safety Is Our Priority</h1>
+                    <p class="hero-subheading">
+                        Learn about our safety features, create a safety plan,
+                        and access resources to help you stay safe.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#reporting" class="btn btn-primary"
+                            >Get Help Now</a
+                        >
+                        <a href="#resources" class="btn btn-secondary"
+                            >Find Resources</a
+                        >
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <i href="/safe.png" class="fas fa-shield-alt"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Features Section -->
+        <section class="safety-features" id="safety-features">
+            <div class="container">
+                <h2 class="section-title">Safety & Privacy Features</h2>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <h3 class="feature-title">Quick Exit</h3>
+                        <p>
+                            Immediately hide the website and redirect to a
+                            neutral site with a single click. The Quick Exit
+                            button is always available in the navigation.
+                        </p>
+                        <div class="quick-exit-demo">
+                            <p>Try our Quick Exit feature:</p>
+                            <a
+                                href="https://www.google.com"
+                                class="btn btn-emergency"
+                                >Quick Exit</a
+                            >
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mask"></i>
+                        </div>
+                        <h3 class="feature-title">Disguised Interface</h3>
+                        <p>
+                            SafeSpace can appear as a notes app or news site to
+                            maintain your privacy and safety. Use the keyboard
+                            shortcut to toggle disguise mode.
+                        </p>
+                        <div class="disguise-demo">
+                            <p>Toggle disguise mode with keyboard shortcut:</p>
+                            <p>
+                                <span class="keyboard-shortcut">Ctrl</span> +
+                                <span class="keyboard-shortcut">Shift</span> +
+                                <span class="keyboard-shortcut">D</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Data Protection</h3>
+                        <p>
+                            All your data is encrypted and stored securely with
+                            strict access controls. We never share your
+                            information without your explicit consent.
+                        </p>
+                        <ul>
+                            <li>End-to-end encryption for all messages</li>
+                            <li>Secure servers located in South Africa</li>
+                            <li>Regular security audits and updates</li>
+                            <li>Option to delete your data at any time</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Planning Section -->
+        <section class="safety-planning" id="safety-plan">
+            <div class="container">
+                <h2 class="section-title">Creating a Safety Plan</h2>
+                <p class="text-center">
+                    A safety plan can help you prepare for potentially dangerous
+                    situations. Here's how to create one:
+                </p>
+
+                <div class="plan-steps">
+                    <div class="plan-step">
+                        <h3>Identify Safe Spaces</h3>
+                        <p>
+                            Determine safe places you can go in an emergency -
+                            friends' houses, family members' homes, or public
+                            places like police stations or hospitals.
+                        </p>
+                    </div>
+
+                    <div class="plan-step">
+                        <h3>Prepare an Emergency Bag</h3>
+                        <p>
+                            Keep a bag with essential items ready: important
+                            documents, medication, some clothes, money, and
+                            emergency contacts.
+                        </p>
+                    </div>
+
+                    <div class="plan-step">
+                        <h3>Establish a Code Word</h3>
+                        <p>
+                            Create a code word with trusted friends or family
+                            that lets them know you need help without alerting
+                            anyone else.
+                        </p>
+                    </div>
+
+                    <div class="plan-step">
+                        <h3>Plan Your Exit Strategy</h3>
+                        <p>
+                            Identify the safest ways to leave your home or
+                            current location in different scenarios (when alone,
+                            with children, etc.).
+                        </p>
+                    </div>
+
+                    <div class="plan-step">
+                        <h3>Save Emergency Contacts</h3>
+                        <p>
+                            Program emergency numbers into your phone under
+                            disguised names and keep a written copy in your
+                            emergency bag.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <a href="/downloads" class="btn btn-primary"
+                        >Download Safety Planning Guide</a
+                    >
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Tips Section -->
+        <section class="about" id="safety-tips">
+            <div class="container">
+                <h2 class="section-title">Safety Tips & Strategies</h2>
+                <p class="text-center">
+                    Practical advice for staying safe in different situations
+                </p>
+
+                <div class="safety-tips-grid">
+                    <div class="safety-tip-card">
+                        <div class="tip-img">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="tip-info">
+                            <h3 class="tip-title">Digital Safety</h3>
+                            <p class="tip-desc">
+                                Use private browsing modes, clear your history
+                                regularly, and check devices for tracking
+                                software.
+                            </p>
+                            <a href="#" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+
+                    <div class="safety-tip-card">
+                        <div class="tip-img">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="tip-info">
+                            <h3 class="tip-title">Home Safety</h3>
+                            <p class="tip-desc">
+                                Change locks if needed, install security
+                                measures, and identify safe rooms and escape
+                                routes.
+                            </p>
+                            <a href="#" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+
+                    <div class="safety-tip-card">
+                        <div class="tip-img">
+                            <i class="fas fa-walking"></i>
+                        </div>
+                        <div class="tip-info">
+                            <h3 class="tip-title">Public Safety</h3>
+                            <p class="tip-desc">
+                                Vary your routines, be aware of your
+                                surroundings, and know how to get help in public
+                                places.
+                            </p>
+                            <a href="#" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+
+                    <div class="safety-tip-card">
+                        <div class="tip-img">
+                            <i class="fas fa-child"></i>
+                        </div>
+                        <div class="tip-info">
+                            <h3 class="tip-title">Safety with Children</h3>
+                            <p class="tip-desc">
+                                Teach children how to get help, establish safe
+                                words, and create safety plans together.
+                            </p>
+                            <a href="#" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+
+                    <div class="safety-tip-card">
+                        <div class="tip-img">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="tip-info">
+                            <h3 class="tip-title">
+                                Using Support Services Safely
+                            </h3>
+                            <p class="tip-desc">
+                                How to access help without compromising your
+                                safety, including using public phones and
+                                internet cafes.
+                            </p>
+                            <a href="#" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+
+                    <div class="safety-tip-card">
+                        <div class="tip-img">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="tip-info">
+                            <h3 class="tip-title">Legal Protection</h3>
+                            <p class="tip-desc">
+                                Understanding protection orders, your legal
+                                rights, and how to document incidents safely.
+                            </p>
+                            <a href="#" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency Resources Section -->
+        <section class="features" id="emergency-resources">
+            <div class="container">
+                <h2 class="section-title">Emergency Resources</h2>
+
+                <div class="features-container">
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h3>Emergency Contacts</h3>
+                        <p>
+                            Save these numbers in your phone under disguised
+                            names:
+                        </p>
+                        <ul>
+                            <li>GBV Emergency Hotline: 0800 428 428</li>
+                            <li>Police Emergency: 10111</li>
+                            <li>SMS Line: 34343 (Text "HELP")</li>
+                            <li>USSD: *134*123#</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3>Safe Places Near You</h3>
+                        <p>
+                            Find shelters, police stations, and hospitals in
+                            your area that can provide safety in an emergency.
+                        </p>
+                        <a href="/shelters" class="btn btn-outline"
+                            >Find Safe Places</a
+                        >
+                    </div>
+
+                    <div class="feature-highlight">
+                        <div class="feature-highlight-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <h3>Downloadable Resources</h3>
+                        <p>
+                            Access safety planning guides, emergency contact
+                            lists, and legal information that you can print or
+                            save offline.
+                        </p>
+                        <a href="/downloads" class="btn btn-outline"
+                            >Download Resources</a
+                        >
+                    </div>
+                </div>
+
+                <div class="emergency-contact-box">
+                    <h3>
+                        <i class="fas fa-exclamation-circle"></i> Immediate
+                        Danger
+                    </h3>
+                    <p>If you are in immediate danger:</p>
+                    <ul>
+                        <li>Try to get to a safe location if possible</li>
+                        <li>Call 10111 for police assistance</li>
+                        <li>Use the Quick Exit button if someone approaches</li>
+                        <li>
+                            If you can't talk, dial 112 and leave the line open
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency CTA Banner -->
+        <section class="cta-banner">
+            <div class="container">
+                <h2 class="cta-heading">Need Immediate Help?</h2>
+                <p class="cta-text">
+                    Contact the GBV Emergency Hotline: 0800 428 428
+                </p>
+                <a href="tel:0800428428" class="btn btn-light">Call Now</a>
+                <a href="sms:34343" class="btn btn-light">SMS HELP</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <a href="index.html" class="footer-logo">SafeSpace</a>
+                        <p class="footer-about">
+                            Providing support, resources, and safe reporting
+                            options for GBV survivors across South Africa.
+                        </p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-links">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/report">Report Incident</a></li>
+                            <li><a href="/downloads">Resources</a></li>
+                            <li><a href="/support">Support</a></li>
+                            <li><a href="/safety">Safety Features</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-contact">
+                        <h3 class="footer-heading">Emergency Contacts</h3>
+                        <p>GBV Emergency Hotline: 0800 428 428</p>
+                        <p>Police Emergency: 10111</p>
+                        <p>SMS Line: 34343</p>
+                        <p>USSD: *134*123#</p>
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>
+                        © 2025 SafeSpace. All rights reserved. |
+                        <a href="#">Privacy Policy</a> |
+                        <a href="#">Terms of Use</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- AI chat (fixed at bottom) -->
+        <div class="chat-container">
+            <div class="chat-button" id="chatToggle">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-window" id="chatWindow">
+                <div class="chat-header">
+                    <h3>SafeSpace Assistant</h3>
+                    <button class="close-chat" id="closeChat">&times;</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        Hi, I'm here to help. How can I assist you today?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Type your question here..."
+                    />
+                    <button id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/script.js"></script>
+        <script>
+            // Function to toggle disguise mode
+            function toggleDisguise() {
+                document.body.classList.toggle("disguise-mode");
+                if (document.body.classList.contains("disguise-mode")) {
+                    document.title = "Weather Forecast";
+                    // You could also change other elements here to complete the disguise
+                } else {
+                    document.title = "Safety Features - SafeSpace";
+                    // Revert other changes here
+                }
+            }
+
+            // Add keyboard shortcut for disguise mode (Ctrl+Shift+D)
+            document.addEventListener("keydown", function (e) {
+                if (e.ctrlKey && e.shiftKey && e.key === "D") {
+                    toggleDisguise();
+                }
+            });
+
+            // Smooth scrolling for anchor links
+            document.addEventListener("DOMContentLoaded", function () {
+                document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                    anchor.addEventListener("click", function (e) {
+                        e.preventDefault();
+
+                        const targetId = this.getAttribute("href");
+                        if (targetId === "#") return;
+
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 100,
+                                behavior: "smooth",
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

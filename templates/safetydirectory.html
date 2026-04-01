@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SafeSpace - Safety Directory</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="/static/styles.css" />
+    </head>
+    <body>
+        <!-- Header / Navigation -->
+        <header id="header">
+            <div class="container nav-container">
+                <a href="index.html" class="logo">
+                    <img
+                        src="/static/images/safe.png"
+                        alt="SafeSpace Logo"
+                        class="safe-logo"
+                    />
+                </a>
+
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/report" class="nav-link">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safetydirectory" class="nav-link"
+                            >Safety Directory</a
+                        >
+                    </li>
+                    <li class="nav-item">
+                        <a href="/downloads" class="nav-link">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/support" class="nav-link">Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/safety" class="nav-link">Safety</a>
+                    </li>
+                    <li class="nav-item nav-cta">
+                        <button
+                            class="btn btn-emergency"
+                            onclick="triggerEmergency()"
+                        >
+                            Emergency Help
+                        </button>
+                    </li>
+
+                    <script>
+                        async function triggerEmergency() {
+                            if (!navigator.geolocation) {
+                                alert(
+                                    "Geolocation is not supported by your browser."
+                                );
+                                return;
+                            }
+
+                            navigator.geolocation.getCurrentPosition(
+                                async (position) => {
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+
+                                    // Reverse geocode: get human-readable address from coordinates
+                                    let address = `Lat: ${lat}, Lon: ${lon}`;
+                                    try {
+                                        const geoRes = await fetch(
+                                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+                                        );
+                                        const geoData = await geoRes.json();
+                                        if (geoData.display_name) {
+                                            address = geoData.display_name;
+                                        }
+                                    } catch (err) {
+                                        console.error(
+                                            "Reverse geocoding failed:",
+                                            err
+                                        );
+                                    }
+
+                                    // Emergency message with location
+                                    const emergencyNumber = "+27612028093";
+                                    const emergencyMessage = `🚨 EMERGENCY ALERT: A user needs immediate help!\n📍 Location: ${address}\n🔗 Maps: https://www.google.com/maps?q=${lat},${lon}`;
+
+                                    // Send to Flask backend -> Africa's Talking
+                                    fetch("/send", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type":
+                                                "application/x-www-form-urlencoded",
+                                        },
+                                        body: `number=${encodeURIComponent(
+                                            emergencyNumber
+                                        )}&message=${encodeURIComponent(
+                                            emergencyMessage
+                                        )}`,
+                                    })
+                                        .then((response) => response.text())
+                                        .then((data) => {
+                                            alert(
+                                                "✅ Emergency alert with live location sent!"
+                                            );
+                                            console.log(
+                                                "Server response:",
+                                                data
+                                            );
+                                        })
+                                        .catch((error) => {
+                                            alert(
+                                                "❌ Failed to send emergency alert."
+                                            );
+                                            console.error("Error:", error);
+                                        });
+                                },
+                                () => {
+                                    alert("⚠️ Unable to retrieve location.");
+                                }
+                            );
+                        }
+                    </script>
+
+                    <li class="nav-item quick-exit">
+                        <a
+                            href="https://www.google.com/search?client=firefox-b-d&q=famous+tik+tok+dances+2025"
+                            class="btn btn-emergency"
+                            >Quick Exit</a
+                        >
+                    </li>
+                </ul>
+
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-heading">Safety Directory & Resources</h1>
+                    <p class="hero-subheading">
+                        Comprehensive directory of emergency contacts, legal
+                        support, and mental health resources for GBV survivors
+                        across South Africa.
+                    </p>
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input
+                                type="text"
+                                id="searchInput"
+                                placeholder="Search for resources, hotlines, or support..."
+                            />
+                            <button id="searchButton" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <i class="fas fa-life-ring"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Directory Content -->
+        <section class="about" id="directory">
+            <div class="container">
+                <h2 class="section-title">Safety Resources Directory</h2>
+                <p class="text-center">
+                    Find the help you need with our comprehensive directory of
+                    emergency contacts, legal support, and mental health
+                    resources.
+                </p>
+
+                <!-- Emergency Hotlines Section -->
+                <div class="directory-section" id="legal">
+                    <h3 class="directory-heading">
+                        Legal & Protection Support
+                    </h3>
+                    <div class="resources-grid">
+                        <div class="resource-card">
+                            <h4 class="resource-title">
+                                Legal Aid South Africa
+                            </h4>
+                            <p class="resource-desc">
+                                Free legal assistance for those who qualify
+                            </p>
+                            <a href="tel:0800110110" class="btn btn-primary"
+                                >Call 0800 110 110</a
+                            >
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">
+                                SA Human Rights Commission
+                            </h4>
+                            <p class="resource-desc">
+                                Report human rights violations
+                            </p>
+                            <a href="tel:0800007709" class="btn btn-primary"
+                                >Call 0800 007 709</a
+                            >
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">Women's Legal Centre</h4>
+                            <p class="resource-desc">
+                                Specialized legal services for women
+                            </p>
+                            <a href="tel:0214245660" class="btn btn-primary"
+                                >Call 021 424 5660</a
+                            >
+                        </div>
+                    </div>
+
+                    <h4 class="sub-heading">
+                        Thuthuzela Care Centres (By Province)
+                    </h4>
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                Gauteng Province
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <p>
+                                    <strong>Johannesburg:</strong> 011 488 4346
+                                </p>
+                                <p><strong>Pretoria:</strong> 012 354 6508</p>
+                                <p><strong>Springs:</strong> 011 812 5512</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                Western Cape Province
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <p><strong>Cape Town:</strong> 021 938 9222</p>
+                                <p>
+                                    <strong>Khayelitsha:</strong> 021 360 4710
+                                </p>
+                                <p><strong>Wynberg:</strong> 021 799 1270</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                KwaZulu-Natal Province
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <p><strong>Durban:</strong> 031 327 2272</p>
+                                <p>
+                                    <strong>Pietermaritzburg:</strong> 033 395
+                                    3040
+                                </p>
+                                <p>
+                                    <strong>Port Shepstone:</strong> 039 682
+                                    4424
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="sub-heading">Legal Resources (by case type)</h4>
+                    <div class="table-container">
+                        <table class="resources-table">
+                            <thead>
+                                <tr>
+                                    <th>Case Type</th>
+                                    <th>Organization / Service</th>
+                                    <th>Contact Information</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>GBV / Domestic Violence</td>
+                                    <td>People Opposing Women Abuse (POWA)</td>
+                                    <td>
+                                        <a href="tel:0116424345">011 642 4345</a
+                                        ><br />
+                                        <a href="tel:0766945911"
+                                            >076 694 5911</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Family Law & Child Protection</td>
+                                    <td>Children's Institute (UCT)</td>
+                                    <td>
+                                        <a href="tel:0216501473"
+                                            >021 650 1473</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Legal Advice & Referrals</td>
+                                    <td>Black Sash</td>
+                                    <td>
+                                        <a href="tel:0726633739"
+                                            >072 663 3739</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Workplace Discrimination</td>
+                                    <td>Commission for Gender Equality</td>
+                                    <td>
+                                        <a href="tel:0800077095"
+                                            >0800 007 709</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>General Legal Queries</td>
+                                    <td>Law Society of South Africa</td>
+                                    <td>
+                                        <a href="tel:0123668800"
+                                            >012 366 8800</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="resource-note">
+                        <p>
+                            <strong>Note:</strong> For specific legal
+                            representation, we recommend contacting Legal Aid
+                            South Africa or the Law Society for referrals to
+                            attorneys specializing in your specific needs in
+                            your area.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- GBV Support Section -->
+                <div class="directory-section" id="gbv-support">
+                    <h3 class="directory-heading">
+                        GBV & Domestic Violence Support
+                    </h3>
+                    <div class="resources-grid">
+                        <div class="resource-card">
+                            <h4 class="resource-title">
+                                Stop Gender Violence Helpline
+                            </h4>
+                            <p class="resource-desc">
+                                National helpline for gender-based violence
+                            </p>
+                            <a href="tel:0800150150" class="btn btn-primary"
+                                >Call 0800 150 150</a
+                            >
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">POWA</h4>
+                            <p class="resource-desc">
+                                People Opposing Women Abuse
+                            </p>
+                            <a href="tel:0766945911" class="btn btn-primary"
+                                >076 694 5911</a
+                            >
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">NISAA Institute</h4>
+                            <p class="resource-desc">
+                                Institute for Women's Development
+                            </p>
+                            <a href="tel:0118545804" class="btn btn-primary"
+                                >Call 011 854 5804</a
+                            >
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">Suicide Crisis Line</h4>
+                            <p class="resource-desc">
+                                24/7 support for individuals in crisis
+                            </p>
+                            <a href="tel:0118545804" class="btn btn-primary"
+                                >Call 0800 567 567</a
+                            >
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">AIDS Helpline</h4>
+                            <p class="resource-desc">
+                                National helpline for AIDS support
+                            </p>
+                            <a href="tel:0118545804" class="btn btn-primary"
+                                >Call 0800 012 322</a
+                            >
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">SAPS Crime Stop</h4>
+                            <p class="resource-desc">
+                                Report crime anonymously
+                            </p>
+                            <a href="tel:0860010111" class="btn btn-primary"
+                                >08600 10111</a
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mental Health Section -->
+                <div class="directory-section" id="mental-health">
+                    <h3 class="directory-heading">Mental Health Support</h3>
+                    <div class="resources-grid">
+                        <div class="resource-card">
+                            <h4 class="resource-title">SADAG</h4>
+                            <p class="resource-desc">
+                                Depression & Anxiety Group
+                            </p>
+                            <a href="tel:0800567567" class="btn btn-primary"
+                                >Call 0800 567 567</a
+                            >
+                            <p class="ussd-code">SMS: 31393</p>
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">
+                                Lifeline South Africa
+                            </h4>
+                            <p class="resource-desc">
+                                Crisis support and counseling
+                            </p>
+                            <a href="tel:0861322322" class="btn btn-primary"
+                                >Call 0861 322 322</a
+                            >
+                        </div>
+                        <div class="resource-card">
+                            <h4 class="resource-title">
+                                Substance Abuse Helpline
+                            </h4>
+                            <p class="resource-desc">
+                                Dept. of Social Development
+                            </p>
+                            <a href="tel:0800121314" class="btn btn-primary"
+                                >Call 0800 121 314</a
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency CTA Banner -->
+        <section class="cta-banner">
+            <div class="container">
+                <h2 class="cta-heading">Need Immediate Help?</h2>
+                <p class="cta-text">
+                    Contact the GBV Emergency Hotline: (+27)61 202 8093
+                </p>
+                <a href="tel:+27612028093" class="btn btn-light">Call Now</a>
+                <a href="tel:*384*7427#" class="btn btn-light">SMS HELP</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <a href="index.html" class="footer-logo">SafeSpace</a>
+                        <p class="footer-about">
+                            Providing support, resources, and safe reporting
+                            options for GBV survivors across South Africa.
+                        </p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-links">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul>
+                            <li><a href="/index">Home</a></li>
+                            <li><a href="/report">Report Incident</a></li>
+                            <li><a href="/downloads">Resources</a></li>
+                            <li><a href="/support">Support</a></li>
+                            <li><a href="/safety">Safety Directory</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-contact">
+                        <h3 class="footer-heading">Emergency Contacts</h3>
+                        <p>GBV Emergency Hotline: 0800 428 428</p>
+                        <p>Police Emergency: 10111</p>
+                        <p>SMS Line: 34343</p>
+                        <p>USSD: *134*123#</p>
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>
+                        © 2025 SafeSpace. All rights reserved. |
+                        <a href="#">Privacy Policy</a> |
+                        <a href="#">Terms of Use</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- AI chat (fixed at bottom) -->
+        <div class="chat-container">
+            <div class="chat-button" id="chatToggle">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-window" id="chatWindow">
+                <div class="chat-header">
+                    <h3>SafeSpace Assistant</h3>
+                    <button class="close-chat" id="closeChat">&times;</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        Hi, I'm here to help. How can I assist you today?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Type your question here..."
+                    />
+                    <button id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/script.js"></script>
+        <script>
+            // Search functionality
+            document.addEventListener("DOMContentLoaded", function () {
+                const searchInput = document.getElementById("searchInput");
+                const searchButton = document.getElementById("searchButton");
+                const allResourceCards =
+                    document.querySelectorAll(".resource-card");
+                const directorySections =
+                    document.querySelectorAll(".directory-section");
+
+                // Search function
+                function performSearch() {
+                    const searchTerm = searchInput.value.toLowerCase().trim();
+
+                    if (searchTerm === "") {
+                        // Show all if search is empty
+                        allResourceCards.forEach((card) => {
+                            card.style.display = "block";
+                        });
+                        directorySections.forEach((section) => {
+                            section.style.display = "block";
+                        });
+                        return;
+                    }
+
+                    let foundResults = false;
+
+                    // Hide all cards first
+                    allResourceCards.forEach((card) => {
+                        card.style.display = "none";
+                    });
+
+                    // Show sections that have matches
+                    directorySections.forEach((section) => {
+                        section.style.display = "none";
+                    });
+
+                    // Show cards that match the search term
+                    allResourceCards.forEach((card) => {
+                        const cardText = card.textContent.toLowerCase();
+                        if (cardText.includes(searchTerm)) {
+                            card.style.display = "block";
+                            card.closest(".directory-section").style.display =
+                                "block";
+                            foundResults = true;
+                        }
+                    });
+
+                    if (!foundResults) {
+                        // Show no results message
+                        const noResults = document.createElement("div");
+                        noResults.className = "no-results";
+                        noResults.innerHTML = `
+                        <h3>No results found for "${searchTerm}"</h3>
+                        <p>Try searching with different keywords or browse the categories above.</p>
+                    `;
+
+                        const directorySection =
+                            document.getElementById("directory");
+                        if (!document.querySelector(".no-results")) {
+                            directorySection.appendChild(noResults);
+                        }
+                    } else {
+                        // Remove no results message if it exists
+                        const noResults = document.querySelector(".no-results");
+                        if (noResults) {
+                            noResults.remove();
+                        }
+                    }
+                }
+
+                // Event listeners
+                searchButton.addEventListener("click", performSearch);
+                searchInput.addEventListener("keypress", function (e) {
+                    if (e.key === "Enter") {
+                        performSearch();
+                    }
+                });
+
+                // Accordion functionality
+                const accordionHeaders =
+                    document.querySelectorAll(".accordion-header");
+                accordionHeaders.forEach((header) => {
+                    header.addEventListener("click", function () {
+                        this.classList.toggle("active");
+                        const content = this.nextElementSibling;
+
+                        if (content.style.display === "block") {
+                            content.style.display = "none";
+                        } else {
+                            content.style.display = "block";
+                        }
+
+                        // Rotate icon
+                        const icon = this.querySelector("i");
+                        icon.classList.toggle("fa-chevron-down");
+                        icon.classList.toggle("fa-chevron-up");
+                    });
+                });
+            });
+        </script>
+
+        <style>
+            /* Additional styles for the safety directory page */
+            .search-container {
+                margin: 30px 0;
+            }
+
+            .search-box {
+                display: flex;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .search-box input {
+                flex: 1;
+                padding: 12px 20px;
+                border: 2px solid var(--primary-color);
+                border-radius: 30px 0 0 30px;
+                font-size: 1rem;
+                outline: none;
+            }
+
+            .search-box button {
+                border-radius: 0 30px 30px 0;
+                white-space: nowrap;
+            }
+
+            .directory-section {
+                margin: 60px 0;
+            }
+
+            .directory-heading {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+                color: var(--dark-gray);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .emergency-icon {
+                color: var(--emergency-color);
+            }
+
+            .legal-icon {
+                color: #8e44ad;
+            }
+
+            .gbv-icon {
+                color: #9b59b6;
+            }
+
+            .mental-health-icon {
+                color: #3498db;
+            }
+
+            .resources-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .resource-card {
+                background: var(--white);
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                transition: var(--transition);
+                text-align: center;
+            }
+
+            .resource-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            }
+
+            .resource-title {
+                font-size: 1.2rem;
+                color: var(--primary-color);
+                margin-bottom: 10px;
+            }
+
+            .resource-desc {
+                margin-bottom: 15px;
+                color: var(--dark-gray);
+                opacity: 0.8;
+            }
+
+            .ussd-code {
+                margin-top: 10px;
+                font-weight: bold;
+                color: var(--primary-color);
+            }
+
+            .sub-heading {
+                font-size: 1.4rem;
+                margin: 30px 0 20px;
+                color: var(--dark-gray);
+            }
+
+            .accordion {
+                margin: 20px 0;
+            }
+
+            .accordion-item {
+                margin-bottom: 10px;
+                border: 1px solid #eee;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+
+            .accordion-header {
+                width: 100%;
+                padding: 15px 20px;
+                background: var(--light-gray);
+                border: none;
+                text-align: left;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .accordion-header:hover {
+                background: #e8e8e8;
+            }
+
+            .accordion-content {
+                padding: 15px 20px;
+                display: none;
+                background: var(--white);
+            }
+
+            .accordion-content p {
+                margin-bottom: 10px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                margin: 20px 0;
+            }
+
+            .resources-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .resources-table th,
+            .resources-table td {
+                padding: 12px 15px;
+                text-align: left;
+                border-bottom: 1px solid #eee;
+            }
+
+            .resources-table th {
+                background-color: var(--light-gray);
+                font-weight: 600;
+            }
+
+            .resources-table tr:hover {
+                background-color: #f9f9f9;
+            }
+
+            .resources-table a {
+                color: var(--primary-color);
+                font-weight: 500;
+            }
+
+            .no-results {
+                text-align: center;
+                padding: 40px;
+                background: var(--light-gray);
+                border-radius: 10px;
+                margin: 30px 0;
+            }
+
+            @media (max-width: 768px) {
+                .search-box {
+                    flex-direction: column;
+                }
+
+                .search-box input {
+                    border-radius: 30px;
+                    margin-bottom: 10px;
+                }
+
+                .search-box button {
+                    border-radius: 30px;
+                }
+
+                .resources-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </body>
+</html>
